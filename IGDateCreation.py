@@ -1,20 +1,26 @@
 import requests
 import re
+import threading
 
 
-url = "https://ig.tools/api/creation_date.php"
+def check(user):
+       try:
+           url = "https://ig.tools/api/creation_date.php"
+           payload = f"username={user}"
+           headers = {
+           'User-Agent': "Cookieizi/1.0",
+           'Accept-Language': "en-us",
+           'Content-Type': "application/x-www-form-urlencoded; charset=UTF-8"
+           }
+           req= requests.post(url, data=payload, headers=headers)
+           res = req.text
+           date = re.search(r'<br> (.*\d?)', res)
+           print(f'</> {user}: {date[1]}')
+       except:
+            print(f"</> {user}: Sorry, this page isn't available.")
+   
 
-username = str(input('Username : '))
-payload = f"username={username}"
-headers = {
-    'User-Agent': "Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1",
-    'Accept-Language': "en-us",
-    'Content-Type': "application/x-www-form-urlencoded; charset=UTF-8"
-    }
+for user in open("usernames.txt",'r').read().splitlines():
+    threadss = threading.Thread(target= check(user))
+    threadss.start()
 
-req= requests.post(url, data=payload, headers=headers)
-res = req.text
-
-date = re.search(r'<br> (.*\d?) to (.*\d?)', res)
-
-print(f'{date[1]}:{date[2]}')
